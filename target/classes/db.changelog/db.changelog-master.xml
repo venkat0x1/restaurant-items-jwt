@@ -1,0 +1,12 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <include file="db.changelog/users.xml"/>
+    <include file="db.changelog/restaurants.xml"/>
+    <include file="db.changelog/items.xml"/>
+    <!--    <include file="db/changelog/food_items.xml"/>-->
+    <!--    <include file="db/changelog/restaurant_food_items.xml"/>-->
+    <!-- add additional changelog files here -->
+</databaseChangeLog>
+

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd
+      http://www.liquibase.org/xml/ns/pro
+      http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd">
+    <includeAll path="com/example/db/changelog/"/>
+
+    <changeSet id="restaurants-db-tag" author="venkat">
+        <tagDatabase tag="restaurants.tbl"></tagDatabase>
+    </changeSet>
+
+    <changeSet id="create-restaurants-table" author="venkat">
+        <createTable tableName="restaurants">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_restaurants_id"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mobile" type="varchar(10)">
+                <constraints nullable="true" checkConstraint="mobile REGEXP '^[0-9]{10}$'"/>
+            </column>
+            <column name="email" type="varchar(100)">
+                <constraints unique="true" nullable="false"
+                             checkConstraint="email REGEXP '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'"/>
+            </column>
+            <column name="website" type="varchar(50)"></column>
+            <column name="specialty" type="varchar(20)"></column>
+            <column name="rating" type="DECIMAL(2,1)" defaultValue="5.0">
+            </column>
+            <column name="x" type="int" defaultValue="0"></column>
+            <column name="y" type="int" defaultValue="0"></column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="insert-into-restaurants" author="venkat">
+        <insert tableName="restaurants">
+            <column name="name" value="Amigos Reasturant" />
+            <column name="address" value="123 Main St." />
+            <column name="mobile" value="1234567890" />
+            <column name="email" value="amigosreasturant@example.com" />
+            <column name="website" value="http://www.AmigosReasturant.com" />
+            <column name="specialty" value="non veg" />
+            <column name="rating" valueNumeric="3.5" />
+            <column name="x" value="1" />
+            <column name="y" valueNumeric="1" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-2-into-restaurants" author="venkat">
+        <insert tableName="restaurants">
+            <column name="name" value="Ruchi Reasturant" />
+            <column name="address" value="123 Main St." />
+            <column name="mobile" value="1234567890" />
+            <column name="email" value="ruchireasturant@example.com" />
+            <column name="website" value="http://www.ruchihReasturant.com" />
+            <column name="specialty" value="non veg" />
+            <column name="rating" valueNumeric="3.5" />
+            <column name="x" value="2" />
+            <column name="y" valueNumeric="2" />
+        </insert>
+    </changeSet>
+
+
+</databaseChangeLog>
