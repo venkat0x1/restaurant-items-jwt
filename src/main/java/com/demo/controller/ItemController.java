@@ -4,25 +4,31 @@ import com.demo.dto.ItemDto;
 import com.demo.dto.ItemResponse;
 import com.demo.entity.Item;
 import com.demo.service.ItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "Item")
 @RequestMapping("/items")
 public class ItemController {
 
     @Autowired
     private ItemService itemService;
 
+    @Operation(summary = "Retrieve all items")
     @GetMapping
     public Page<Item> getAllItems(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortByName, @RequestParam(defaultValue = "ASC") String sortDirection) {
         return itemService.getAllItems(offset, pageSize, sortByName, sortDirection);
     }
 
+
+    @Operation(summary = "Retrieve item by id")
     @GetMapping("/{id}")
-    public  ResponseEntity<ItemDto> getItemsById(@PathVariable int id){
+    public  ResponseEntity<ItemDto> getItemById(@PathVariable int id){
         return itemService.getItemById(id);
     }
     @GetMapping("/name/{itemName}")

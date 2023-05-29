@@ -3,6 +3,7 @@ package com.demo.controller;
 import com.demo.entity.Restaurant;
 import com.demo.entity.User;
 import com.demo.service.RestaurantService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Tag(name = "Restaurant")
 @RequestMapping("/restaurants")
 public class RestaurantController {
 

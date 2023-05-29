@@ -3,12 +3,14 @@ package com.demo.controller;
 import com.demo.dto.AuthRequest;
 import com.demo.entity.User;
 import com.demo.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Tag(name = "User")
 @RequestMapping("/users")
 public class UserController {
 
@@ -17,7 +19,7 @@ public class UserController {
 
     @PostMapping("/login")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        return userService.authenticateAndGetToken(authRequest);
+        return "accessToken : "+userService.authenticateAndGetToken(authRequest);
     }
 
     @PostMapping("/signup")

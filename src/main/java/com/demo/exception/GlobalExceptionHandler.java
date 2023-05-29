@@ -30,4 +30,10 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false) );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException exception,WebRequest request){
+        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }
