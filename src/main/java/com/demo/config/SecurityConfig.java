@@ -1,6 +1,6 @@
 package com.demo.config;
 
-import com.demo.config.CustomUserDetailsService;
+import com.demo.service.CustomUserDetailsService;
 import com.demo.filter.JwtAuthFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

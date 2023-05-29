@@ -1,6 +1,6 @@
 package com.demo.filter;
 
-import com.demo.config.CustomUserDetailsService;
+import com.demo.service.CustomUserDetailsService;
 import com.demo.exception.InvalidTokenException;
 import com.demo.service.JwtService;
 import jakarta.servlet.FilterChain;

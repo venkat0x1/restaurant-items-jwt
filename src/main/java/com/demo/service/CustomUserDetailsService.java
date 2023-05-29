@@ -1,4 +1,4 @@
-package com.demo.config;
+package com.demo.service;
 
 import com.demo.entity.User;
 import com.demo.repository.UserRepository;
