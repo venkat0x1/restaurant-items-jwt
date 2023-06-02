@@ -1,6 +1,8 @@
 package com.demo.service;
 
 import com.demo.dto.AuthRequest;
+import com.demo.dto.LoginResponse;
+import com.demo.dto.UserDto;
 import com.demo.entity.User;
 import com.demo.exception.ArgumentsMismatchException;
 import com.demo.exception.ResourceNotFoundException;
@@ -40,10 +42,13 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public LoginResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getUsername());
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername()));
+            loginResponse.setMail(authRequest.getUsername());
+            return loginResponse;
         } else {
             throw new UsernameNotFoundException("Invalid user credentials");
         }
@@ -60,20 +65,23 @@ public class UserService {
         return authentication != null ? authentication.getName() : null;
     }
 
-    public ResponseEntity<User> addUser(User user) {
-        try {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setRoles(user.getRoles() == null ? "USER" : user.getRoles());
-            User savedUser = userRepository.save(user);
-            return ResponseEntity.ok(savedUser);
-        } catch (Exception e) {
-            throw new ArgumentsMismatchException("Invalid user details");
-        }
+
+    public ResponseEntity<User> addUser(UserDto userDto) {
+
+        User user = new User();
+
+        user.setName(userDto.getName());
+        user.setMobile(userDto.getMobile());
+        user.setMail(userDto.getMail());
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRoles(userDto.getRoles());
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.ok(savedUser);
     }
 
 
     public Page<User> getAllUsers(int offset, int pageSize, String sortBy, String orderDirection) {
-        return userRepository.findAll(RestaurantService.getPageable(offset,pageSize,sortBy,orderDirection));
+        return userRepository.findAll(RestaurantService.getPageable(offset, pageSize, sortBy, orderDirection));
     }
 
     public ResponseEntity<User> getUserById(int id) {

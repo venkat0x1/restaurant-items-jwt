@@ -1,6 +1,8 @@
 package com.demo.controller;
 
 import com.demo.dto.AuthRequest;
+import com.demo.dto.LoginResponse;
+import com.demo.dto.UserDto;
 import com.demo.entity.User;
 import com.demo.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,13 +20,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        return "accessToken : "+userService.authenticateAndGetToken(authRequest);
+    public LoginResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+        return userService.authenticateAndGetToken(authRequest);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> addNewUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public ResponseEntity<User> addNewUser(@RequestBody UserDto userDto) {
+        return userService.addUser(userDto);
     }
 
     @GetMapping("/all")

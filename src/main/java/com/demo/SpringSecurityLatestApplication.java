@@ -1,5 +1,6 @@
 package com.demo;
 
+import com.demo.repository.UserRepository;
 import com.demo.service.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -9,23 +10,32 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-//import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import java.util.List;
 
 @SpringBootApplication
 @EnableScheduling
 public class SpringSecurityLatestApplication {
 
+	@Autowired
+	private UserRepository userRepository;
+
 	public static void main(String[] args) {
 		SpringApplication.run(SpringSecurityLatestApplication.class, args);
 	}
+
 
 	@Autowired
 	private EmailSenderService emailSenderService;
 	@EventListener(ApplicationReadyEvent.class)
 	@Scheduled(cron = "0 */5 * * * *")
 	public void triggerMail(){
-		emailSenderService.sendEmail("venkatmakka1432@gmail.com",
-				"This is From Spring Restaurant_Food_Items Application Invitation --- Venkat..",
-				"conformation mail");
+		List<String>allUsersMails=userRepository.getAllUsersMails();
+		for(String userMail:allUsersMails){
+			emailSenderService.sendEmail(userMail,
+					"This is From Spring Restaurant_Food_Items Application Invitation --- Venkat..http://localhost:8080/users/conform",
+					"conformation mail");
+		}
+
 	}
 }

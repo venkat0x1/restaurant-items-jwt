@@ -1,5 +1,6 @@
 package com.demo.service;
 
+import com.demo.dto.RestaurantResponse;
 import com.demo.entity.Restaurant;
 import com.demo.exception.ArgumentsMismatchException;
 import com.demo.exception.ResourceNotFoundException;
@@ -30,13 +31,15 @@ public class RestaurantService {
         return orderDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
     }
 
-    public static Pageable getPageable(int offset, int pageSize, String sortBy, String orderDirection){
-        return PageRequest.of(getMaxValue(offset),getMaxValue(pageSize),getSortDirection(orderDirection), sortBy);
+    public static Pageable getPageable(int pageNumber, int pageSize, String sortBy, String orderDirection){
+        return PageRequest.of(getMaxValue(pageNumber),getMaxValue(pageSize),getSortDirection(orderDirection), sortBy);
     }
 
 
-    public Page<Restaurant> getAllRestaurants(int offset, int pageSize, String sortBy, String orderDirection) {
-        return restaurantRepository.findAll(getPageable(offset,pageSize,sortBy,orderDirection));
+    public ResponseEntity<RestaurantResponse> getAllRestaurants(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+        Page<Restaurant> restaurantPage= restaurantRepository.findAll(getPageable(pageNumber, pageSize, sortBy, sortDirection));
+        RestaurantResponse restaurantResponse=new RestaurantResponse(restaurantPage.getSize(),restaurantPage.getContent(),pageNumber,pageSize,restaurantPage.getTotalPages(),restaurantPage.getTotalElements());
+        return ResponseEntity.ok(restaurantResponse);
     }
 
     public ResponseEntity<Restaurant> getRestaurantById(int id) {

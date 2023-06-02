@@ -1,5 +1,6 @@
 package com.demo.controller;
 
+import com.demo.dto.RestaurantResponse;
 import com.demo.entity.Restaurant;
 import com.demo.entity.User;
 import com.demo.service.RestaurantService;
@@ -20,8 +21,8 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @GetMapping
-    public Page<Restaurant> getAllRestaurants(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy,@RequestParam(defaultValue = "ASC") String orderDirection) {
-        return restaurantService.getAllRestaurants(offset,pageSize,sortBy,orderDirection);
+    public ResponseEntity<RestaurantResponse> getAllRestaurants(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy, @RequestParam(defaultValue = "ASC") String sortDirection) {
+        return restaurantService.getAllRestaurants(pageNumber,pageSize,sortBy,sortDirection);
     }
 
     @GetMapping("/{id}")
