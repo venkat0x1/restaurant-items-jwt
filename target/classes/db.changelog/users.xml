@@ -98,11 +98,9 @@
         </update>
     </changeSet>
 
-<!--    <changeSet id="set-default-verification_status" author="Venkat">-->
-<!--        <update tableName="users">-->
-<!--            <column name="verification_status" value="pending" />-->
-<!--            <where>verification_status IS NULL</where>-->
-<!--        </update>-->
-<!--    </changeSet>-->
+    <changeSet id="delete-is-verified-column-users" author="Venkat">
+        <dropColumn tableName="users" columnName="is_verified"/>
+    </changeSet>
+
 
 </databaseChangeLog>

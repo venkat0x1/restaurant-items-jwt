@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByMail(String mail);
 
-    @Query("from User u where u.verificationStatus='pending' and u.mail=:mail")
-    User getUnverifiedUserBymail(String mail);
+//    @Query("from User u where u.verificationStatus='pending' and u.mail=:mail")
+//    User getUnverifiedUserBymail(String mail);
 
     @Query("FROM User u WHERE u.verificationStatus = 'pending' ")
     List<User> getUnverifiedUsers();

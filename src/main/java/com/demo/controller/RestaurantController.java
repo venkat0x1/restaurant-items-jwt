@@ -1,8 +1,7 @@
 package com.demo.controller;
 
-import com.demo.dto.RestaurantResponse;
+import com.demo.dto.PageResponse;
 import com.demo.entity.Restaurant;
-import com.demo.entity.User;
 import com.demo.service.RestaurantService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class RestaurantController {
     private RestaurantService restaurantService;
 
     @GetMapping
-    public ResponseEntity<RestaurantResponse> getAllRestaurants(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy, @RequestParam(defaultValue = "ASC") String sortDirection) {
+    public ResponseEntity<PageResponse> getAllRestaurants(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy, @RequestParam(defaultValue = "ASC") String sortDirection) {
         return restaurantService.getAllRestaurants(pageNumber,pageSize,sortBy,sortDirection);
     }
 
@@ -30,26 +29,24 @@ public class RestaurantController {
         return restaurantService.getRestaurantById(id);
     }
 
-    @GetMapping("/name/{name}")
-    public ResponseEntity<Page<Restaurant>> getRestaurantsByName(@PathVariable String name,@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy,@RequestParam(defaultValue = "ASC") String orderDirection){
-
-        return restaurantService.getRestaurantsByName(name,offset,pageSize,sortBy,orderDirection);
+    @GetMapping("/name")
+    public ResponseEntity<List<Restaurant>> getRestaurantsByName(@RequestParam String name){
+        return restaurantService.getRestaurantsByName(name);
     }
 
     @GetMapping("/near-by")
-    public Page<Restaurant> getAllRestaurantsOrderByDistance(@RequestParam(defaultValue = "0") int x, @RequestParam(defaultValue = "0") int y,@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy,@RequestParam(defaultValue = "ASC") String orderDirection){
-        return restaurantService.getAllRestaurantsOrderByDistance(x,y,offset,pageSize,sortBy,orderDirection);
+    public List<Restaurant> getAllRestaurantsOrderByDistance(@RequestParam(defaultValue = "0") int x, @RequestParam(defaultValue = "0") int y){
+        return restaurantService.getAllRestaurantsOrderByDistance(x,y);
     }
 
-    @GetMapping("/items/{itemName}")
-    public ResponseEntity<Page<Restaurant>> getRestaurantsByItem(@PathVariable String itemName,@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy,@RequestParam(defaultValue = "ASC") String orderDirection) {
-        return restaurantService.getRestaurantsByItem(itemName,offset,pageSize,sortBy,orderDirection);
+    @GetMapping("/items")
+    public ResponseEntity<List<Restaurant>> getRestaurantsByItem(@RequestParam String itemName) {
+        return restaurantService.getRestaurantsByItem(itemName);
     }
 
-
-    @GetMapping("/items/{itemName}/price")
-    public ResponseEntity<Page<Restaurant>> getRestaurantsByItemAndPrice(@PathVariable String itemName, @RequestParam(defaultValue = "100") double lowPrice, @RequestParam(defaultValue = "500") double highPrice, @RequestParam(defaultValue ="0") int x, @RequestParam(defaultValue="0") int y,@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10")  int pageSize, @RequestParam(defaultValue = "name") String sortBy,@RequestParam(defaultValue = "ASC") String orderDirection) {
-        return restaurantService.getNearbyRestaurantsByItemAndPriceRange(itemName, lowPrice, highPrice,x,y,offset,pageSize,sortBy,orderDirection);
+    @GetMapping("/items/price")
+    public ResponseEntity<List<Restaurant>> getRestaurantsByItemAndPrice(@RequestParam String itemName, @RequestParam(defaultValue = "100") double lowPrice, @RequestParam(defaultValue = "500") double highPrice, @RequestParam(defaultValue ="0") int x, @RequestParam(defaultValue="0") int y) {
+        return restaurantService.getNearbyRestaurantsByItemAndPriceRange(itemName, lowPrice, highPrice,x,y);
     }
 
     @PostMapping

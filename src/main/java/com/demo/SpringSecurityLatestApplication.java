@@ -24,18 +24,4 @@ public class SpringSecurityLatestApplication {
 		SpringApplication.run(SpringSecurityLatestApplication.class, args);
 	}
 
-
-//	@Autowired
-//	private EmailSenderService emailSenderService;
-//	@EventListener(ApplicationReadyEvent.class)
-//	@Scheduled(cron = "0 */5 * * * *")
-//	public void triggerMail(){
-//		List<String>allUsersMails=userRepository.getAllUsersMails();
-//		for(String userMail:allUsersMails){
-//			emailSenderService.sendEmail(userMail,
-//					"This is From Spring Restaurant_Food_Items Application Invitation --- Venkat..http://localhost:8080/users/conform",
-//					"conformation mail");
-//		}
-//
-//	}
 }

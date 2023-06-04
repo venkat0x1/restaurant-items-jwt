@@ -19,24 +19,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @PostMapping("/login")
-//    public LoginResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-//        return userService.authenticateAndGetToken(authRequest);
-//    }
-//
-//    @PostMapping("/signup")
-//    public ResponseEntity<User> addNewUser(@RequestBody UserDto userDto) {
-//        return userService.addUser(userDto);
-//    }
-
     @PutMapping("/verify")
     public ResponseEntity<String> userVerification(@RequestParam String id) {
         return userService.userVerification(id);
     }
 
-    @GetMapping("/all")
-    public Page<User> getAllUsers(@RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "name") String sortBy, @RequestParam(defaultValue = "ASC") String sortDirection) {
-        return userService.getAllUsers(offset, pageSize, sortBy, sortDirection);
+    @GetMapping
+    public Page<User> getAllUsers(@RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "name") String sortBy, @RequestParam(defaultValue = "ASC") String sortDirection) {
+        return userService.getAllUsers(pageNumber, pageSize, sortBy, sortDirection);
     }
 
     @GetMapping("/{id}")
@@ -44,13 +34,9 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-//    @GetMapping
-//    public ResponseEntity<User> getUserByMail(@RequestParam String mail) {
-//        return userService.getUserByMail(mail);
-//    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUserById(@PathVariable int id, @RequestBody User user) {
+    public ResponseEntity<User> updateUserById(@PathVariable int id, @RequestBody User user) {
         return userService.updateUserById(id, user);
     }
 
@@ -59,14 +45,5 @@ public class UserController {
         return userService.deleteUserById(id);
     }
 
-//    @DeleteMapping
-//    public ResponseEntity<String> deleteUserByMail(@RequestParam String mail) {
-//        return userService.deleteUserByUsername(mail);
-//    }
-
-//    @PutMapping("/{id}/{roles}")
-//    public ResponseEntity<String> updateUserRolesById(@PathVariable int id,@PathVariable String roles){
-//        return userService.updateRolesById(id,roles);
-//    }
 
 }

@@ -37,8 +37,6 @@ public class User {
 
     private String roles;
 
-    private boolean isVerified;
-
     private String verificationStatus;
 
 }

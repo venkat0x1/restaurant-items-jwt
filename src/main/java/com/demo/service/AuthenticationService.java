@@ -4,7 +4,7 @@ import com.demo.dto.AuthRequest;
 import com.demo.dto.LoginResponse;
 import com.demo.dto.UserDto;
 import com.demo.entity.User;
-import com.demo.exception.ArgumentsMismatchException;
+import com.demo.exception.InvalidInputException;
 import com.demo.exception.UserUnauthorizedException;
 import com.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,18 +45,18 @@ public class AuthenticationService {
                 LoginResponse loginResponse = new LoginResponse();
                 Optional<User> optionalUser = userRepository.findByMail(authRequest.getUsername());
                 User user = optionalUser.get();
-                if (user.getVerificationStatus().equals("pending")){
-                    emailSenderService.emailSending(user.getMail(),user.getId());
+                if (user.getVerificationStatus().equals("pending")) {
+                    emailSenderService.emailSending(user.getMail(), user.getId());
                     throw new UserUnauthorizedException("check your email and conform your account verification");
                 }
                 loginResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername()));
                 loginResponse.setUser(user);
                 return ResponseEntity.ok(loginResponse);
             } else {
-                throw new ArgumentsMismatchException("Invalid user credentials");
+                throw new InvalidInputException("Invalid user credentials");
             }
         } catch (AuthenticationException ex) {
-            throw new ArgumentsMismatchException("Invalid user credentials");
+            throw new InvalidInputException("Invalid user credentials");
         }
     }
 
@@ -75,15 +75,19 @@ public class AuthenticationService {
 
 
     public ResponseEntity<User> addUser(UserDto userDto) {
-        User user = new User();
-        user.setName(userDto.getName());
-        user.setMobile(userDto.getMobile());
-        user.setMail(userDto.getMail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRoles(userDto.getRoles().toUpperCase());
-        User savedUser = userRepository.save(user);
-        emailSenderService.emailSending(savedUser.getMail(),savedUser.getId());
-        return ResponseEntity.ok(savedUser);
+        try {
+            User user = new User();
+            user.setName(userDto.getName());
+            user.setMobile(userDto.getMobile());
+            user.setMail(userDto.getMail());
+            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+            user.setRoles(userDto.getRoles().toUpperCase());
+            user.setVerificationStatus("pending");
+            User savedUser = userRepository.save(user);
+            emailSenderService.emailSending(savedUser.getMail(), savedUser.getId());
+            return ResponseEntity.ok(savedUser);
+        } catch (Exception e) {
+            throw new InvalidInputException("Invalid Input..!");
+        }
     }
-
 }

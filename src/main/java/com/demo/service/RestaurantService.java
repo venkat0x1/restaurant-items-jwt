@@ -1,8 +1,8 @@
 package com.demo.service;
 
-import com.demo.dto.RestaurantResponse;
+import com.demo.dto.PageResponse;
 import com.demo.entity.Restaurant;
-import com.demo.exception.ArgumentsMismatchException;
+import com.demo.exception.InvalidInputException;
 import com.demo.exception.ResourceNotFoundException;
 import com.demo.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RestaurantService {
@@ -31,15 +30,29 @@ public class RestaurantService {
         return orderDirection.equalsIgnoreCase("ASC") ? Sort.Direction.ASC : Sort.Direction.DESC;
     }
 
-    public static Pageable getPageable(int pageNumber, int pageSize, String sortBy, String orderDirection){
-        return PageRequest.of(getMaxValue(pageNumber),getMaxValue(pageSize),getSortDirection(orderDirection), sortBy);
+    public static Pageable getPageable(int pageNumber, int pageSize, String sortBy, String sortDirection){
+        return PageRequest.of(getMaxValue(pageNumber),getMaxValue(pageSize),getSortDirection(sortDirection), sortBy);
     }
 
-
-    public ResponseEntity<RestaurantResponse> getAllRestaurants(int pageNumber, int pageSize, String sortBy, String sortDirection) {
+    public ResponseEntity<PageResponse> getAllRestaurants(int pageNumber, int pageSize, String sortBy, String sortDirection) {
         Page<Restaurant> restaurantPage= restaurantRepository.findAll(getPageable(pageNumber, pageSize, sortBy, sortDirection));
-        RestaurantResponse restaurantResponse=new RestaurantResponse(restaurantPage.getSize(),restaurantPage.getContent(),pageNumber,pageSize,restaurantPage.getTotalPages(),restaurantPage.getTotalElements());
-        return ResponseEntity.ok(restaurantResponse);
+        return getPageResponse(restaurantPage);
+    }
+
+    public static ResponseEntity<PageResponse> getPageResponse(Page<?> page){
+        if (page.isEmpty()){
+            throw new ResourceNotFoundException("Not found any data");
+        }
+        PageResponse pageResponse =new PageResponse();
+        pageResponse.setRecordCount(page.getNumberOfElements());
+        pageResponse.setResponse(page.getContent());
+        LinkedHashMap<String, Integer> metaData = new LinkedHashMap<>();
+        metaData.put("pageNumber", page.getNumber());
+        metaData.put("pageSize", page.getSize());
+        metaData.put("totalPages", page.getTotalPages());
+        metaData.put("totalElements", (int) page.getTotalElements());
+        pageResponse.setMetaData(metaData);
+        return ResponseEntity.ok(pageResponse);
     }
 
     public ResponseEntity<Restaurant> getRestaurantById(int id) {
@@ -48,21 +61,20 @@ public class RestaurantService {
         return ResponseEntity.ok(restaurant);
     }
 
-    public ResponseEntity<Page<Restaurant>> getRestaurantsByItem(String itemName, int offset, int pageSize, String sortBy, String orderDirection) {
-        Page<Restaurant> restaurantList = restaurantRepository.getRestaurantsByItemName(itemName, getPageable(offset,pageSize,sortBy,orderDirection));
+    public ResponseEntity<List<Restaurant>> getRestaurantsByItem(String itemName) {
+        List<Restaurant> restaurantList = restaurantRepository.getRestaurantsByItemName(itemName);
         if (restaurantList.isEmpty()) {
             throw new ResourceNotFoundException("No restaurants found with the given item: " + itemName);
         }
         return ResponseEntity.ok(restaurantList);
     }
 
-    public Page<Restaurant> getAllRestaurantsOrderByDistance(int x, int y, int offset, int pageSize, String sortBy, String orderDirection) {
-        Pageable pageable = PageRequest.of(getMaxValue(offset),getMaxValue(pageSize), getSortDirection(orderDirection), sortBy);
-        return restaurantRepository.getAllRestaurantsOrderByDistance(getMaxValue(x), getMaxValue(y), pageable);
+    public List<Restaurant> getAllRestaurantsOrderByDistance(int x, int y) {
+        return restaurantRepository.getAllRestaurantsOrderByDistance(getMaxValue(x), getMaxValue(y));
     }
 
-    public ResponseEntity<Page<Restaurant>> getNearbyRestaurantsByItemAndPriceRange(String itemName, double lowPrice, double highPrice, int x, int y, int offset, int pageSize, String sortBy, String orderDirection) {
-        Page<Restaurant> restaurantList = restaurantRepository.getNearByRestaurantsByItemNameAndPriceRange(getMaxValue(x),getMaxValue(y), itemName, lowPrice, highPrice, getPageable(offset,pageSize,sortBy,orderDirection));
+    public ResponseEntity<List<Restaurant>> getNearbyRestaurantsByItemAndPriceRange(String itemName, double lowPrice, double highPrice, int x, int y) {
+        List<Restaurant> restaurantList = restaurantRepository.getNearByRestaurantsByItemNameAndPriceRange(getMaxValue(x),getMaxValue(y), itemName, lowPrice, highPrice);
         if (restaurantList.isEmpty()) {
             throw new ResourceNotFoundException("No restaurants found with the given item name and price range.");
         }
@@ -73,12 +85,12 @@ public class RestaurantService {
         try {
             return ResponseEntity.ok(restaurantRepository.save(restaurant));
         } catch (Exception ex) {
-            throw new ArgumentsMismatchException("Invalid restaurant details");
+            throw new InvalidInputException("Invalid restaurant details");
         }
     }
 
-    public ResponseEntity<Page<Restaurant>> getRestaurantsByName(String name, int offset, int pageSize, String sortBy, String orderDirection) {
-        Page<Restaurant> restaurantList = restaurantRepository.getRestaurantsByName(name, getPageable(offset,pageSize,sortBy,orderDirection));
+    public ResponseEntity<List<Restaurant>> getRestaurantsByName(String name) {
+        List<Restaurant> restaurantList = restaurantRepository.getRestaurantsByName(name);
         if (restaurantList.isEmpty()) {
             throw new ResourceNotFoundException("No restaurants found with the given name: " + name);
         }
@@ -112,7 +124,7 @@ public class RestaurantService {
             restaurantRepository.save(restaurant);
             return ResponseEntity.ok("Restaurant information updated.");
         } catch (Exception ex) {
-            throw new ArgumentsMismatchException("Invalid restaurant details for update.");
+            throw new InvalidInputException("Invalid restaurant details for update.");
         }
     }
 

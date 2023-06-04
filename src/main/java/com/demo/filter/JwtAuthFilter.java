@@ -1,7 +1,7 @@
 package com.demo.filter;
 
+import com.demo.exception.UserUnauthorizedException;
 import com.demo.service.CustomUserDetailsService;
-import com.demo.exception.InvalidTokenException;
 import com.demo.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,7 +43,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
-                throw new InvalidTokenException("Invalid Token..!");
+                throw new UserUnauthorizedException("Invalid Token..!");
             }
         }
         filterChain.doFilter(request, response);

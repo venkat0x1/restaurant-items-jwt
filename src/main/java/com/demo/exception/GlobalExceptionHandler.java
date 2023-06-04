@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,8 +17,8 @@ public class GlobalExceptionHandler {
      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    @ExceptionHandler(ArgumentsMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleArgumentsMismatchException(ArgumentsMismatchException exception, WebRequest request){
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<ErrorResponse> handleArgumentsMismatchException(InvalidInputException exception, WebRequest request){
         ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(), HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false) );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -31,11 +29,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
 
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException exception,WebRequest request){
-        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+//    @ExceptionHandler(InvalidTokenException.class)
+//    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException exception,WebRequest request){
+//        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false));
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+//    }
 
     @ExceptionHandler(VerificationException.class)
     public ResponseEntity<ErrorResponse> handleVerificationException(VerificationException exception,WebRequest request){
@@ -43,9 +41,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException exception,WebRequest request){
-        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
+//    @ExceptionHandler(BadRequestException.class)
+//    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException exception,WebRequest request){
+//        ErrorResponse errorResponse=new ErrorResponse(LocalDateTime.now(),HttpStatus.BAD_REQUEST.value(),exception.getMessage(),request.getDescription(false));
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+//    }
 }
