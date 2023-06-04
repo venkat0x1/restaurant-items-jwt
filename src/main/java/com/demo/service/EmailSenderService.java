@@ -21,9 +21,13 @@ public class EmailSenderService {
 
         javaMailSender.send(mailMessage);
         System.out.println("mail send...!");
-
     }
 
+    public void emailSending(String email,int id){
+        sendEmail(email,
+                "This is From Spring Restaurant_Food_Items Application Invitation --- Venkat click this link and conform your verification    http://localhost:8080/users/verify?id=" + id,
+                "conformation mail");
+    }
 
 }
 

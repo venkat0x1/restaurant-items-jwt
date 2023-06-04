@@ -7,15 +7,19 @@ import com.demo.entity.User;
 import com.demo.exception.ArgumentsMismatchException;
 import com.demo.exception.ResourceNotFoundException;
 import com.demo.exception.UserUnauthorizedException;
+import com.demo.exception.VerificationException;
 import com.demo.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +29,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,53 +37,84 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+//
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
+//
+//    @Autowired
+//    private JwtService jwtService;
+//
+//    @Autowired
+//    private AuthenticationManager authenticationManager;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private EmailSenderService emailSenderService;
 
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    public LoginResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        if (authentication.isAuthenticated()) {
-            LoginResponse loginResponse = new LoginResponse();
-            loginResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername()));
-            loginResponse.setMail(authRequest.getUsername());
-            return loginResponse;
-        } else {
-            throw new UsernameNotFoundException("Invalid user credentials");
+    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "0 */5 * * * *")
+    public void triggerMail() {
+        List<User> allUnverifiedUsers = userRepository.getUnverifiedUsers();
+        for (User user : allUnverifiedUsers) {
+            emailSenderService.emailSending(user.getMail(),user.getId());
         }
+
     }
 
-    private boolean isAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"));
+//    public LoginResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+//        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+//        if (authentication.isAuthenticated()) {
+//            LoginResponse loginResponse = new LoginResponse();
+//            loginResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername()));
+//            loginResponse.setMail(authRequest.getUsername());
+//            return loginResponse;
+//        } else {
+//            throw new UsernameNotFoundException("Invalid user credentials");
+//        }
+//    }
+//
+//    private boolean isAdmin() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        return authentication != null && authentication.getAuthorities().stream()
+//                .anyMatch(auth -> auth.getAuthority().equals("ADMIN"));
+//    }
+//
+//    private String getUserMail() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        return authentication != null ? authentication.getName() : null;
+////        return authentication.getName();
+//    }
+//
+//
+//    public ResponseEntity<User> addUser(UserDto userDto) {
+//        User user = new User();
+//        user.setName(userDto.getName());
+//        user.setMobile(userDto.getMobile());
+//        user.setMail(userDto.getMail());
+//        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+//        user.setRoles(userDto.getRoles().toUpperCase());
+//        User savedUser = userRepository.save(user);
+//        emailSenderService.sendEmail(savedUser.getMail(),
+//                "This is From Spring Restaurant_Food_Items Application Invitation --- Venkat click this link and conform your verification    http://localhost:8080/users/verify?id=" + savedUser.getId(),
+//                "conformation mail");
+//        return ResponseEntity.ok(savedUser);
+//    }
+
+    public ResponseEntity<String> userVerification(String id) {
+        int userId;
+        try {
+            userId = Integer.parseInt(id);
+        } catch (NumberFormatException e) {
+            throw new ArgumentsMismatchException("Invalid user ID format: " + id);
+        }
+        Optional<User> user = userRepository.findById(userId);
+        User existingUser = user.orElseThrow(() -> new ResourceNotFoundException("User not found with Id : " + id));
+        if(existingUser.getVerificationStatus().equals("completed")){
+            throw new VerificationException("Verification was already completeed with id :"+id);
+        }
+        existingUser.setVerificationStatus("completed");
+        userRepository.save(existingUser);
+        return ResponseEntity.ok("User verification successful..!");
     }
-
-    private String getUserMail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null ? authentication.getName() : null;
-    }
-
-
-    public ResponseEntity<User> addUser(UserDto userDto) {
-
-        User user = new User();
-
-        user.setName(userDto.getName());
-        user.setMobile(userDto.getMobile());
-        user.setMail(userDto.getMail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRoles(userDto.getRoles());
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(savedUser);
-    }
-
 
     public Page<User> getAllUsers(int offset, int pageSize, String sortBy, String orderDirection) {
         return userRepository.findAll(RestaurantService.getPageable(offset, pageSize, sortBy, orderDirection));
@@ -87,44 +123,45 @@ public class UserService {
     public ResponseEntity<User> getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
         User existingUser = user.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        if (!isAdmin() && !getUserMail().equals(existingUser.getMail())) {
+        if (!AuthenticationService.isAdmin() && !AuthenticationService.getUserMail().equals(existingUser.getMail())) {
             throw new UserUnauthorizedException("You are not authorized to get this user's details.");
         }
         return ResponseEntity.ok(existingUser);
     }
 
-    public ResponseEntity<User> getUserByMail(String mail) {
-        Optional<User> user = userRepository.findByMail(mail);
-        User existingUser = user.orElseThrow(() -> new ResourceNotFoundException("User not found with mail: " + mail));
-        if (!isAdmin() && !getUserMail().equals(existingUser.getMail())) {
-            throw new UserUnauthorizedException("You are not authorized to get this user's details.");
-        }
-        return ResponseEntity.ok(existingUser);
-    }
+//    public ResponseEntity<User> getUserByMail(String mail) {
+//        Optional<User> user = userRepository.findByMail(mail);
+//        User existingUser = user.orElseThrow(() -> new ResourceNotFoundException("User not found with mail: " + mail));
+//        if (!AuthenticationService.isAdmin() && !AuthenticationService.getUserMail().equals(existingUser.getMail())) {
+//            throw new UserUnauthorizedException("You are not authorized to get this user's details.");
+//        }
+//        return ResponseEntity.ok(existingUser);
+//    }
 
     public ResponseEntity<String> deleteUserById(int id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found with id: " + id);
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException("User not found with id : " + id);
         } else {
             userRepository.deleteById(id);
             return ResponseEntity.ok("User deleted successfully");
         }
     }
 
-    public ResponseEntity<String> deleteUserByUsername(String mail) {
-        Optional<User> userOptional = userRepository.findByMail(mail);
-        if (userOptional.isEmpty()) {
-            throw new ResourceNotFoundException("User not found with mail: " + mail);
-        } else {
-            userRepository.deleteByMail(mail);
-            return ResponseEntity.ok("User deleted successfully");
-        }
-    }
+//    public ResponseEntity<String> deleteUserByUsername(String mail) {
+//        Optional<User> userOptional = userRepository.findByMail(mail);
+//        if (userOptional.isEmpty()) {
+//            throw new ResourceNotFoundException("User not found with mail: " + mail);
+//        } else {
+//            userRepository.deleteByMail(mail);
+//            return ResponseEntity.ok("User deleted successfully");
+//        }
+//    }
 
-    public ResponseEntity<String> updateUserByMail(String mail, User updateUser) {
-        Optional<User> existingUser = userRepository.findByMail(mail);
-        User user = existingUser.orElseThrow(() -> new ResourceNotFoundException("User not found with mail: " + mail));
-        if (!isAdmin() && updateUser.getRoles() != null) {
+    public ResponseEntity<String> updateUserById(int id, User updateUser) {
+        Optional<User> existingUser = userRepository.findById(id);
+        User user = existingUser.orElseThrow(() -> new ResourceNotFoundException("User not found with Id : " + id));
+        if (!AuthenticationService.isAdmin() && updateUser.getRoles() != null) {
             throw new UserUnauthorizedException("You are not authorized for changing user's roles.");
         }
         user.setName(updateUser.getName() != null ? updateUser.getName() : user.getName());

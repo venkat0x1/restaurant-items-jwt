@@ -1,5 +1,6 @@
 package com.demo.dto;
 
+import com.demo.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Data
 public class LoginResponse {
 
-    private String mail;
+    private User user;
     private String accessToken;
 
 }

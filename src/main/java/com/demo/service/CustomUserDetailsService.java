@@ -1,5 +1,6 @@
 package com.demo.service;
 
+import com.demo.entity.CustomUserDetails;
 import com.demo.entity.User;
 import com.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = repository.findByMail(username);
-        return user.map(User::new)
+        return user.map(CustomUserDetails::new)
                 .orElseThrow(() -> new UsernameNotFoundException("user not found " + username));
 
     }
