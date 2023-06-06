@@ -43,10 +43,10 @@ public class AuthenticationService {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
             if (authentication.isAuthenticated()) {
                 LoginResponse loginResponse = new LoginResponse();
-                Optional<User> optionalUser = userRepository.findByMail(authRequest.getUsername());
+                Optional<User> optionalUser = userRepository.findByEmail(authRequest.getUsername());
                 User user = optionalUser.get();
                 if (user.getVerificationStatus().equals("pending")) {
-                    emailSenderService.emailSending(user.getMail(), user.getId());
+                    emailSenderService.emailSending(user.getEmail(), user.getId());
                     throw new UserUnauthorizedException("check your email and conform your account verification");
                 }
                 loginResponse.setAccessToken(jwtService.generateToken(authRequest.getUsername()));
@@ -79,12 +79,12 @@ public class AuthenticationService {
             User user = new User();
             user.setName(userDto.getName());
             user.setMobile(userDto.getMobile());
-            user.setMail(userDto.getMail());
+            user.setEmail(userDto.getEmail());
             user.setPassword(passwordEncoder.encode(userDto.getPassword()));
             user.setRoles(userDto.getRoles().toUpperCase());
             user.setVerificationStatus("pending");
             User savedUser = userRepository.save(user);
-            emailSenderService.emailSending(savedUser.getMail(), savedUser.getId());
+            emailSenderService.emailSending(savedUser.getEmail(), savedUser.getId());
             return ResponseEntity.ok(savedUser);
         } catch (Exception e) {
             throw new InvalidInputException("Invalid Input..!");

@@ -102,5 +102,9 @@
         <dropColumn tableName="users" columnName="is_verified"/>
     </changeSet>
 
+    <changeSet id="change-mail-column-name-email" author="Venkat">
+        <renameColumn tableName="users" oldColumnName="mail" newColumnName="email" columnDataType="varchar(100)"/>
+    </changeSet>
+
 
 </databaseChangeLog>

@@ -17,14 +17,14 @@ public class CustomUserDetails implements UserDetails {
 
     private String password;
 
-    private String mail;
+    private String email;
 
     @Transient
     @JsonIgnore
     private List<GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
-        mail = user.getMail();
+        email = user.getEmail();
         password= user.getPassword();
         authorities= Arrays.stream(user.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
@@ -43,7 +43,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return mail;
+        return email;
     }
 
     @Override

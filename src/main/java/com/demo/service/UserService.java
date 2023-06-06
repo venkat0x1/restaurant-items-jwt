@@ -31,11 +31,10 @@ public class UserService {
     public void triggerMail() {
         List<User> allUnverifiedUsers = userRepository.getUnverifiedUsers();
         for (User user : allUnverifiedUsers) {
-            emailSenderService.emailSending(user.getMail(),user.getId());
+            emailSenderService.emailSending(user.getEmail(),user.getId());
         }
 
     }
-
 
     public ResponseEntity<String> userVerification(String id) {
         int userId;
@@ -61,7 +60,7 @@ public class UserService {
     public ResponseEntity<User> getUserById(int id) {
         Optional<User> user = userRepository.findById(id);
         User existingUser = user.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        if (!AuthenticationService.isAdmin() && !AuthenticationService.getUserMail().equals(existingUser.getMail())) {
+        if (!AuthenticationService.isAdmin() && !AuthenticationService.getUserMail().equals(existingUser.getEmail())) {
             throw new UserUnauthorizedException("You are not authorized to get this user's details.");
         }
         return ResponseEntity.ok(existingUser);
@@ -86,7 +85,7 @@ public class UserService {
         }
         user.setName(updateUser.getName() != null ? updateUser.getName() : user.getName());
         user.setMobile(updateUser.getMobile() != null ? updateUser.getMobile() : user.getMobile());
-        user.setMail(updateUser.getMail() != null ? updateUser.getMail() : user.getMail());
+        user.setEmail(updateUser.getEmail() != null ? updateUser.getEmail() : user.getEmail());
         user.setPassword(updateUser.getPassword() != null ? updateUser.getPassword() : user.getPassword());
         user.setRoles(updateUser.getRoles() != null ? updateUser.getRoles() : user.getRoles());
         user.setVerificationStatus(updateUser.getVerificationStatus() !=null ? updateUser.getVerificationStatus():user.getVerificationStatus());
