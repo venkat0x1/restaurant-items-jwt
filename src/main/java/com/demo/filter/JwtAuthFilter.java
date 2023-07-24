@@ -1,6 +1,7 @@
 package com.demo.filter;
 
-import com.demo.config.CustomUserDetailsService;
+import com.demo.exception.UserUnauthorizedException;
+import com.demo.service.CustomUserDetailsService;
 import com.demo.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -41,6 +42,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                throw new UserUnauthorizedException("Invalid Token..!");
             }
         }
         filterChain.doFilter(request, response);

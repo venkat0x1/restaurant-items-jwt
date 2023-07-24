@@ -24,6 +24,6 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
 
 
     @Query("SELECT new com.demo.dto.ItemResponse(r.name, r.address, i.name, i.price, i.description) FROM Item i JOIN i.restaurant r WHERE i.restaurant.name = :restaurantName")
-    Page<ItemResponse> getItemsByRestaurantName(String restaurantName,Pageable pageable);
+    List<ItemResponse> getItemsByRestaurantName(String restaurantName);
 
 }

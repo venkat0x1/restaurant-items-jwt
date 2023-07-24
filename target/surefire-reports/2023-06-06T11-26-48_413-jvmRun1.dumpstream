@@ -1,0 +1,28 @@
+# Created at 2023-06-06T11:27:13.465
+Unexpected IOException with stream: 2023-06-06T11:27:13.465+05:30  INFO 6295 --- [           main] SQL dialect                              : HHH000400: Using dialect: org.hibernate.dialect.SQLServerDialect
+
+
+# Created at 2023-06-06T11:27:14.429
+Unexpected IOException with stream: 2023-06-06T11:27:14.429+05:30  INFO 6295 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+
+
+# Created at 2023-06-06T11:27:14.435
+Unexpected IOException with stream: 2023-06-06T11:27:14.435+05:30  INFO 6295 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+
+
+# Created at 2023-06-06T11:27:15.060
+Unexpected IOException with stream: 2023-06-06T11:27:15.060+05:30  WARN 6295 --- [           main] o.s.w.c.s.GenericWebApplicationContext   : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'authenticationController': Lookup method resolution failed
+
+
+# Created at 2023-06-06T11:27:15.061
+Unexpected IOException with stream: 2023-06-06T11:27:15.061+05:30  INFO 6295 --- [           main] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+
+
+# Created at 2023-06-06T11:27:15.067
+Unexpected IOException with stream: 2023-06-06T11:27:15.066+05:30  INFO 6295 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+
+
+# Created at 2023-06-06T11:27:15.082
+Unexpected IOException with stream: 2023-06-06T11:27:15.082+05:30  INFO 6295 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+
