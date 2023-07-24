@@ -17,6 +17,9 @@ import java.util.List;
 @EnableScheduling
 public class SpringSecurityLatestApplication {
 
+
+	// PR checking
+
 	@Autowired
 	private UserRepository userRepository;
 
